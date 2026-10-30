@@ -87,17 +87,18 @@ describe('getPrintArea', () => {
   });
 
   it('left-aligns a 63 mm column on 80mm paper so the slip folds once', () => {
-    // 63 mm at 180 dpi = 446 dots, rounded down to whole bytes
+    // 512 dots at 180 dpi = 72.25 mm printable, so a ~3.9 mm paper margin on the left:
+    // 63 - 3.9 = 59.1 mm = 418 dots, rounded down to whole bytes
     expect(getPrintArea(PAPER_PRESETS['80mm_180dpi'], true)).toEqual({
       leftMarginDots: 0,
-      widthDots: 440,
-      charsPerLine: 36,
+      widthDots: 416,
+      charsPerLine: 34,
     });
-    // 63 mm at 203 dpi = 503 dots
+    // 576 dots at 203 dpi = 72.07 mm printable: 63 - 3.96 = 59.04 mm = 471 dots
     expect(getPrintArea(PAPER_PRESETS['80mm'], true)).toEqual({
       leftMarginDots: 0,
-      widthDots: 496,
-      charsPerLine: 41,
+      widthDots: 464,
+      charsPerLine: 38,
     });
   });
 
