@@ -7,15 +7,17 @@ export interface PaperPresetSpec {
   dotsPerLine: number;
   /** Font A characters per line, used for receipt text wrapping */
   charsPerLine: number;
+  /** Print-head resolution, used to convert millimetres to dots */
+  dpi: number;
   /** Short label for the settings toggle */
   label: string;
 }
 
 export const PAPER_PRESETS: Record<PaperPreset, PaperPresetSpec> = {
-  '58mm': { id: '58mm', paperWidth: 58, dotsPerLine: 384, charsPerLine: 32, label: '58' },
-  '80mm': { id: '80mm', paperWidth: 80, dotsPerLine: 576, charsPerLine: 48, label: '80' },
+  '58mm': { id: '58mm', paperWidth: 58, dotsPerLine: 384, charsPerLine: 32, dpi: 203, label: '58' },
+  '80mm': { id: '80mm', paperWidth: 80, dotsPerLine: 576, charsPerLine: 48, dpi: 203, label: '80' },
   // 80mm paper on 180 dpi heads (e.g. Epson TM-H6000 series): 512 dots, 42 columns
-  '80mm_180dpi': { id: '80mm_180dpi', paperWidth: 80, dotsPerLine: 512, charsPerLine: 42, label: '80·512' },
+  '80mm_180dpi': { id: '80mm_180dpi', paperWidth: 80, dotsPerLine: 512, charsPerLine: 42, dpi: 180, label: '80·512' },
 };
 
 /** Order the settings toggle cycles through. */
@@ -38,4 +40,37 @@ export function resolvePaperPreset(
 export function nextPaperPreset(current: PaperPreset): PaperPreset {
   const index = PAPER_PRESET_ORDER.indexOf(current);
   return PAPER_PRESET_ORDER[(index + 1) % PAPER_PRESET_ORDER.length];
+}
+
+/** Width of a Magic card; card-size prints stay inside this so the slip can be trimmed to fit a sleeve. */
+export const CARD_WIDTH_MM = 63;
+
+/** Font A character width in dots (12x24 on both 180 and 203 dpi heads). */
+const FONT_A_WIDTH_DOTS = 12;
+
+export interface PrintArea {
+  /** Left margin in dots (GS L) */
+  leftMarginDots: number;
+  /** Printable width in dots (GS W); also the raster image width */
+  widthDots: number;
+  /** Font A characters that fit in widthDots */
+  charsPerLine: number;
+}
+
+/**
+ * Printable area for a preset. Card-size limits the area to CARD_WIDTH_MM, centred
+ * on the paper; paper narrower than a card (58mm) always uses its full width.
+ */
+export function getPrintArea(preset: PaperPresetSpec, cardSize: boolean): PrintArea {
+  if (!cardSize) {
+    return { leftMarginDots: 0, widthDots: preset.dotsPerLine, charsPerLine: preset.charsPerLine };
+  }
+  // Raster widths must be whole bytes, so round down to a multiple of 8 dots
+  const cardDots = Math.floor((CARD_WIDTH_MM * preset.dpi) / 25.4 / 8) * 8;
+  const widthDots = Math.min(cardDots, preset.dotsPerLine);
+  return {
+    leftMarginDots: Math.floor((preset.dotsPerLine - widthDots) / 2),
+    widthDots,
+    charsPerLine: Math.min(preset.charsPerLine, Math.floor(widthDots / FONT_A_WIDTH_DOTS)),
+  };
 }

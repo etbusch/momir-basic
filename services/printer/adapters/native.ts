@@ -180,7 +180,7 @@ export class NativeThermalPrinterAdapter implements PrinterPort {
       const btAddress = toBtAddress(this._connectedAddress);
       const { image } = require('react-native-thermal-printer-driver');
 
-      await NativeModules.ThermalPrinterDriver.printImage(btAddress, base64, 'base64', width, 0, true, 10000);
+      await NativeModules.ThermalPrinterDriver.printImage(btAddress, base64, 'base64', width, 1, true, 10000); // align 1 = centre (card-size images are narrower than the paper)
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       throw new PrinterAdapterError(
