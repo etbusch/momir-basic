@@ -39,6 +39,9 @@ export function useAutoPrint({ card, printerSettings }: UseAutoPrintOptions) {
             });
             await adapter.sendImage(rasterized.base64Png, rasterized.widthPx, rasterized.heightPx);
           }
+          if (printerSettings.cutAfterPrint) {
+            await adapter.cutPaper();
+          }
         } else {
           const { EscPosRenderer } = await import('@/services/printer/render/escpos');
           const { CardReceiptDocument } = await import('@/services/printer/render/document');
@@ -83,7 +86,7 @@ export function useAutoPrint({ card, printerSettings }: UseAutoPrintOptions) {
           const capabilities = {
             supportImage: true,
             supportQR: true,
-            supportCut: false,
+            supportCut: printerSettings.cutAfterPrint ?? false,
             supportText: true,
             paperWidth,
           };
@@ -91,7 +94,7 @@ export function useAutoPrint({ card, printerSettings }: UseAutoPrintOptions) {
           const doc = new CardReceiptDocument(cardReceiptData, {
             printArt,
             printQR: printerSettings.printQR ?? true,
-            cut: false,
+            cut: printerSettings.cutAfterPrint ?? false,
             paperWidth,
             charsPerLine: paperPreset.charsPerLine,
             qrSize: printerSettings.qrSize ?? 8,

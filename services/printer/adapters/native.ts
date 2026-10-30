@@ -259,7 +259,7 @@ export class NativeThermalPrinterAdapter implements PrinterPort {
 
     try {
 
-      await NativeModules.ThermalPrinterDriver.printRaw(connection.driverAddress, [0x1D, 0x56, 0x00], false, 10000);
+      await NativeModules.ThermalPrinterDriver.printRaw(connection.driverAddress, [0x1D, 0x56, 0x42, 0x00], false, 10000); // GS V B 0: feed + partial cut
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       throw new PrinterAdapterError(
