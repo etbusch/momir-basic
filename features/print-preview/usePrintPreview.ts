@@ -167,6 +167,9 @@ export function usePrintPreview(card: Card | null, isDoubleFaced: boolean): UseP
             await adapter.sendImage(rasterizedBack.base64Png, rasterizedBack.widthPx, rasterizedBack.heightPx);
           }
         }
+        if (settings.printer?.cutAfterPrint) {
+          await adapter.cutPaper();
+        }
       } else {
         // RECEIPT MODE: ESC/POS document via EscPosRenderer + sendRaw
         const { EscPosRenderer } = await import('@/services/printer/render/escpos');
@@ -239,7 +242,7 @@ export function usePrintPreview(card: Card | null, isDoubleFaced: boolean): UseP
         const capabilities = {
           supportImage: true,
           supportQR: true,
-          supportCut: false,
+          supportCut: settings.printer?.cutAfterPrint ?? false,
           supportText: true,
           paperWidth,
         };
@@ -247,7 +250,7 @@ export function usePrintPreview(card: Card | null, isDoubleFaced: boolean): UseP
         const doc = new CardReceiptDocument(enrichedCardData, {
           printArt,
           printQR: settings.printer?.printQR ?? true,
-          cut: false,
+          cut: settings.printer?.cutAfterPrint ?? false,
           paperWidth,
           qrSize: settings.printer?.qrSize ?? 8,
           qrErrorCorrection: settings.printer?.qrErrorCorrection ?? 'L',
