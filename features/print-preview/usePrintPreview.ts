@@ -8,7 +8,7 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import { rasterizeCardArtForPrint } from '@/utils/printerImage';
 import type { Card } from '@/types';
 import { registryService } from '@/services/printer/registry/service';
-import { resolvePaperPreset } from '@/constants/paperPresets';
+import { getPrintArea, resolvePaperPreset } from '@/constants/paperPresets';
 
 export type PrinterConnectionState = 'checking' | 'connected' | 'disconnected' | 'no_printer';
 
@@ -134,7 +134,8 @@ export function usePrintPreview(card: Card | null, isDoubleFaced: boolean): UseP
       const paperPreset = resolvePaperPreset(settings.printer ?? {});
       const paperWidth = paperPreset.paperWidth;
       const printMode = settings.printer?.printMode ?? 'full';
-      const widthPx = paperPreset.dotsPerLine;
+      const printArea = getPrintArea(paperPreset, settings.printer?.cardSizePrint ?? false);
+      const widthPx = printArea.widthDots;
 
       if (printMode === 'image_only') {
         // IMAGE-ONLY MODE: Print rasterized card image(s)
@@ -251,7 +252,9 @@ export function usePrintPreview(card: Card | null, isDoubleFaced: boolean): UseP
           printQR: settings.printer?.printQR ?? true,
           cut: settings.printer?.cutAfterPrint ?? false,
           paperWidth,
-          charsPerLine: paperPreset.charsPerLine,
+          charsPerLine: printArea.charsPerLine,
+          // Only send GS L / GS W when card-size is on, so other printers get unchanged receipts
+          printArea: settings.printer?.cardSizePrint ? printArea : undefined,
           qrSize: settings.printer?.qrSize ?? 8,
           qrErrorCorrection: settings.printer?.qrErrorCorrection ?? 'L',
         });
