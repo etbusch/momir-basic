@@ -131,7 +131,7 @@ export interface PrinterPreferences {
   paperWidth: 58 | 80;
   /** Selected paper preset; when unset, derived from paperWidth (pre-preset settings) */
   paperPreset?: PaperPreset;
-  /** Limit prints to card width (63 mm), centred, so slips fit a sleeve */
+  /** Limit prints to card width (63 mm), left-aligned, so slips fold once to fit a sleeve */
   cardSizePrint?: boolean;
   printArt: boolean;
   printQR: boolean;

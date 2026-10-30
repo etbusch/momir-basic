@@ -58,7 +58,7 @@ export interface PrintArea {
 }
 
 /**
- * Printable area for a preset. Card-size limits the area to CARD_WIDTH_MM, centred
+ * Printable area for a preset. Card-size limits the area to CARD_WIDTH_MM, left-aligned
  * on the paper; paper narrower than a card (58mm) always uses its full width.
  */
 export function getPrintArea(preset: PaperPresetSpec, cardSize: boolean): PrintArea {
@@ -69,7 +69,8 @@ export function getPrintArea(preset: PaperPresetSpec, cardSize: boolean): PrintA
   const cardDots = Math.floor((CARD_WIDTH_MM * preset.dpi) / 25.4 / 8) * 8;
   const widthDots = Math.min(cardDots, preset.dotsPerLine);
   return {
-    leftMarginDots: Math.floor((preset.dotsPerLine - widthDots) / 2),
+    // Left-aligned: the unused strip is all on one side, so the slip folds once to card width
+    leftMarginDots: 0,
     widthDots,
     charsPerLine: Math.min(preset.charsPerLine, Math.floor(widthDots / FONT_A_WIDTH_DOTS)),
   };
