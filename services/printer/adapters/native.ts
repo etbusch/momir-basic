@@ -196,7 +196,7 @@ export class NativeThermalPrinterAdapter implements PrinterPort {
 
     try {
 
-      await NativeModules.ThermalPrinterDriver.printImage(connection.driverAddress, base64, 'base64', width, 1, true, 10000); // align 1 = centre (card-size images are narrower than the paper)
+      await NativeModules.ThermalPrinterDriver.printImage(connection.driverAddress, base64, 'base64', width, 0, true, 10000); // align 0 = left, matching card-size receipts
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       throw new PrinterAdapterError(

@@ -86,16 +86,16 @@ describe('getPrintArea', () => {
     });
   });
 
-  it('centres a 63 mm column on 80mm paper', () => {
+  it('left-aligns a 63 mm column on 80mm paper so the slip folds once', () => {
     // 63 mm at 180 dpi = 446 dots, rounded down to whole bytes
     expect(getPrintArea(PAPER_PRESETS['80mm_180dpi'], true)).toEqual({
-      leftMarginDots: 36,
+      leftMarginDots: 0,
       widthDots: 440,
       charsPerLine: 36,
     });
     // 63 mm at 203 dpi = 503 dots
     expect(getPrintArea(PAPER_PRESETS['80mm'], true)).toEqual({
-      leftMarginDots: 40,
+      leftMarginDots: 0,
       widthDots: 496,
       charsPerLine: 41,
     });
